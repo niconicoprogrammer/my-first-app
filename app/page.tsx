@@ -1,4 +1,3 @@
-import Image from "next/image";
 import NavLink from '@/app/ui/nav-link';
 
 export default function Home() {
