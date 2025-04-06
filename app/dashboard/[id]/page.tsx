@@ -1,6 +1,6 @@
 import CoinDetail from '@/app/ui/dashboard/coin-detail';
 
-export default async function Page({ 
+export default async function Page({
   params,
 }: {
   params: { id: string };
