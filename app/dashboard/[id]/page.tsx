@@ -1,7 +1,5 @@
 import CoinDetail from '@/app/ui/dashboard/coin-detail';
 
-export const dynamic = 'force-dynamic';
-
 export default async function Page({
   params,
 }: {
