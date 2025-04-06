@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import NavLinks from '@/app/ui/dashboard/nav-links';    
 
 export default function NavBar() {

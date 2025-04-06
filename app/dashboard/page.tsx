@@ -1,4 +1,3 @@
-
 import CoinList from '@/app/ui/dashboard/coin-list';
 
 export default async function Page() {

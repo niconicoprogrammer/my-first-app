@@ -1,4 +1,3 @@
-import SideNav from '@/app/ui/dashboard/sidenav';
 import NavLink from '@/app/ui/dashboard/nav-link';
 import NavBar from '@/app/ui/dashboard/nav-bar';
 import BreadCrumb from '@/app/ui/dashboard/bread-crumb';

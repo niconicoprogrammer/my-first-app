@@ -1,9 +1,17 @@
 import CoinDetail from '@/app/ui/dashboard/coin-detail';
 
-export default function Page({ params }: { params: { id: string } }) {
+type Props = {
+  params: {
+    id: string;
+  }
+}
+
+export default async function Page({ params }: Props) {
+  const id = (await params).id;
+
   return (
     <main>
-      <CoinDetail id={params.id} />
+      <CoinDetail id={id} />
     </main>
   );
 }
