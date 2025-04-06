@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export default async function Page({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { id } = await Promise.resolve(params);
 
