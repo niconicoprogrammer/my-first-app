@@ -1,6 +1,7 @@
 'use client';
 
-import NavLinks from '@/app/ui/dashboard/nav-links';    
+import NavLinks from '@/app/ui/dashboard/nav-links'; 
+import { signOutAction } from '@/app/lib/actions'; 
 
 export default function NavBar() {
   return (
@@ -18,7 +19,11 @@ export default function NavBar() {
         </nav>
 
         <div className="flex-1">
-
+          <form action={signOutAction}>
+            <button>
+              <div>Sign Out</div>
+            </button>
+          </form>
         </div>
 
         {/* 右：検索とログインボタン */}
