@@ -11,17 +11,19 @@ type Coin = {
   current_price: number;
 };
 
-export default function CoinList() {
+export default function CoinList({ page }: { page: number }) {
   const [coins, setCoins] = useState<Coin[]>([]);
+  const ITEMS_PER_PAGE = 10;
 
   useEffect(() => {
+    // ✅ ページ番号をURLに反映してAPI呼び出し
     fetch(
-      'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page=1&sparkline=false'
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=${ITEMS_PER_PAGE}&page=${page}&sparkline=false`
     )
       .then((res) => res.json())
       .then((data) => setCoins(data))
       .catch((error) => console.error('APIエラー:', error));
-  }, []);
+  }, [page]); // ✅ page が変わるたびに再取得！
 
   return (
     <div className="w-full overflow-x-auto">
@@ -31,7 +33,6 @@ export default function CoinList() {
             <th className="py-2 px-4">#</th>
             <th className="py-2 px-4">通貨</th>
             <th className="py-2 px-4">価格</th>
-            <th className="py-2 px-4">詳細</th>
           </tr>
         </thead>
         <tbody>
