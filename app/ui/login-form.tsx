@@ -2,11 +2,8 @@
 
 import { useActionState } from 'react';
 import { authenticate } from '@/app/lib/actions';
-import { useSearchParams } from 'next/navigation';
 
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
 
   // useActionState
   // useActionStateを呼び出すと、3つの戻り値が返ってくる
@@ -65,8 +62,6 @@ export default function LoginForm() {
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
           />
         </div>
-
-        <input type="hidden" name="redirectTo" value={callbackUrl} />
 
         <button
           type="submit"

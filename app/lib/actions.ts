@@ -4,7 +4,9 @@ import { signIn , signOut} from '@/auth';
 import { AuthError } from 'next-auth';
 
 export async function signOutAction() {
-  await signOut({ redirectTo: '/' });
+  // login画面に切り替わるがURLがdashboardのままの不具合
+  // 原因不明
+  await signOut({ redirect: false });
 }
  
 export async function authenticate(

@@ -2,8 +2,16 @@
 
 import NavLinks from '@/app/ui/dashboard/nav-links'; 
 import { signOutAction } from '@/app/lib/actions'; 
+import { useRouter } from 'next/navigation';
 
 export default function NavBar() {
+  const router = useRouter();
+
+  async function handleSignOut() {
+    await signOutAction();
+    router.push('/login'); // URLも確実に変わる
+  }
+
   return (
     <header className="w-full bg-white shadow-sm border-b">
       <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -19,7 +27,7 @@ export default function NavBar() {
         </nav>
 
         <div className="flex-1">
-          <form action={signOutAction}>
+          <form action={handleSignOut}>
             <button>
               <div>Sign Out</div>
             </button>
