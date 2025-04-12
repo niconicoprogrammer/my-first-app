@@ -23,7 +23,7 @@ export async function login(f_prevState: string | undefined, formData: FormData)
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/dashboard?login=success')
 }
 
 export async function signup(_prevState: string | undefined, formData: FormData) {
@@ -44,7 +44,7 @@ export async function signup(_prevState: string | undefined, formData: FormData)
   }
 
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect('/dashboard?signup=success')
 }
 
 export async function logout() {
