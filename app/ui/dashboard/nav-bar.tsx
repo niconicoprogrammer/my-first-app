@@ -3,9 +3,8 @@
 import { useEffect, useState, useActionState } from 'react';
 import NavLinks from '@/app/ui/dashboard/nav-links'; 
 import { logout } from '@/app/lib/actions'; 
-import { useRouter } from 'next/navigation';
+import { useRouter,  useSearchParams } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
-import { useSearchParams } from 'next/navigation'
 
 export default function NavBar() {
   const [email, setEmail] = useState<string | null>(null);
