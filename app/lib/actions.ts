@@ -1,30 +1,57 @@
-'use server';
- 
-import { signIn , signOut} from '@/auth';
-import { AuthError } from 'next-auth';
+'use server'
 
-export async function signOutAction() {
-  // login画面に切り替わるがURLがdashboardのままの不具合
-  // 原因不明
-  await signOut({ redirect: false });
-}
- 
-export async function authenticate(
-  prevState: string | undefined, //useActionState() から渡ってくる「前回の状態（主にエラーメッセージ）」。使わないなら _ にしてもOK。
-  formData: FormData, //クライアントのフォームで送られてきたデータ。formData.get('email') などで取り出せる
-) {
-  try {
-    // auth.tsのsignIn()を呼び出す
-    await signIn('credentials', formData); //credentials は next-auth の「メール＋パスワード」などを使った認証方式
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'メールアドレスまたはパスワードが間違っています。';
-        default:
-          return '問題が発生しました。';
-      }
-    }
-    throw error;
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/app/lib/supabase/server'
+
+export async function login(f_prevState: string | undefined, formData: FormData) {
+  const supabase = await createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
   }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    // redirect('/error')
+    return error.message // ✅ useActionState に返す
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
+}
+
+export async function signup(_prevState: string | undefined, formData: FormData) {
+  const supabase = await createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    // redirect('/error')
+    return error.message // ✅ useActionState に返す
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/dashboard')
+}
+
+export async function logout() {
+  const supabase = await createClient()
+
+  await supabase.auth.signOut()
+
+  revalidatePath('/', 'layout') // キャッシュ再検証（任意）
+  redirect('/login') // ログイン画面にリダイレクト
 }

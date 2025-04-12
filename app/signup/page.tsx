@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link';
-import { login } from '@/app/lib/actions';
+import { signup } from '@/app/lib/actions'
 import { useActionState } from 'react';
 import { useState } from 'react';
 
@@ -9,7 +9,7 @@ export default function Page() {
   const [email, setEmail] = useState('');
 
   const [errorMessage, formAction, isPending] = useActionState(
-    login,
+    signup,
     undefined
   );
 
@@ -20,7 +20,7 @@ export default function Page() {
         className="bg-[#1e293b] text-white p-8 rounded-2xl shadow-xl w-full max-w-md space-y-6 border border-gray-700"
       >
         <h1 className="text-3xl font-extrabold text-center text-yellow-400">
-          ログイン
+          新規登録
         </h1>
 
         {errorMessage && (
@@ -62,13 +62,13 @@ export default function Page() {
           disabled={isPending}
           className="w-full bg-yellow-400 text-[#0f172a] font-semibold py-2 px-4 rounded-md hover:bg-yellow-300 transition disabled:opacity-50"
         >
-          {isPending ? 'ログイン中...' : 'ログイン'}
+          {isPending ? '登録中...' : '新規登録'}
         </button>
 
         <div className="text-center text-sm text-gray-400">
           アカウントをお持ちでない場合は{' '}
-          <Link href="/signup" className="text-yellow-400 hover:underline font-medium">
-            新規登録
+          <Link href="/login" className="text-yellow-400 hover:underline font-medium">
+            ログイン
           </Link>
         </div>
       </form>
