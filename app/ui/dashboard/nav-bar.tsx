@@ -11,7 +11,7 @@ export default function NavBar() {
   const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
   
-  const [errorMessage, formAction, isPending] = useActionState(
+  const [, formAction, isPending] = useActionState(
     logout,
     undefined
   );
