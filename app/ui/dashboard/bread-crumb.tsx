@@ -12,8 +12,13 @@ export default function Breadcrumb() {
       <ol className="flex items-center flex-wrap gap-1">
       {segments.map((segment, index) => {
         const href = '/' + segments.slice(0, index + 1).join('/');
-        const label = decodeURIComponent(segment);
+        let label = decodeURIComponent(segment);
 
+        if(label === 'dashboard') {
+          label = '資産管理';
+        } else if(label === 'trades') {
+          label = '取引履歴';
+        }
         return (
           <li key={href} className="flex items-center gap-1">
             {index !== 0 && <span className="text-gray-500">›</span>}

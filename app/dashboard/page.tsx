@@ -1,10 +1,18 @@
 'use client';
 
 import CoinList from '@/app/ui/dashboard/coin-list';
-import { useState } from 'react';
+import DepositModal from '@/app/ui/dashboard/deposit-modal';
+import { useState, useEffect } from 'react';
+import {fetchUsdBalance} from '@/app/lib/actions';
 
 export default function Page() {
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(1)
+  const [showDepositModal, setShowDepositModal] = useState(false)
+  const [usdTotal, setUsdTotal] = useState<number | null>(null)
+
+  useEffect(() => {
+    refreshUsdTotal()
+  }, []) // ← 初回マウント時のみ実行
 
   function getPagination(current: number): number[] {
     if (current <= 3) return [1, 2, 3, 4, 5];
@@ -13,6 +21,11 @@ export default function Page() {
 
   const pagination = getPagination(page);
 
+  async function refreshUsdTotal() {
+    const total = await fetchUsdBalance()
+    setUsdTotal(total)
+  }
+
   return (
     <main className="min-h-screen bg-[#0f172a] text-white px-4 py-8">
       <div className="max-w-screen-xl mx-auto space-y-8">
@@ -20,16 +33,16 @@ export default function Page() {
         <div className="flex flex-wrap justify-center items-end gap-x-12 gap-y-6">
           <div className="text-center">
             <p className="text-sm text-gray-400">総資産</p>
-            <p className="text-2xl font-semibold text-white">¥1,234,567</p>
+            <p className="text-2xl font-semibold text-white">${usdTotal}</p>
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-gray-400">円資産</p>
-            <p className="text-2xl font-semibold text-white">¥987,654</p>
+            <p className="text-sm text-gray-400">米ドル資産</p>
+            <p className="text-2xl font-semibold text-white">${usdTotal}</p>
           </div>
 
           <button
-            // onClick={() => setShowDepositModal(true)}
+            onClick={() => setShowDepositModal(true)}
             className="px-5 py-2 bg-yellow-400 text-black rounded hover:bg-yellow-500 font-semibold"
           >
             入金
@@ -75,6 +88,14 @@ export default function Page() {
           </button>
         </div>
       </div>
+      <DepositModal
+        open={showDepositModal}
+        onClose={() => setShowDepositModal(false)}
+        onSuccess={() => {
+          refreshUsdTotal()       // ✅ ← 再取得
+          setShowDepositModal(false) // ✅ モーダルを閉じる
+        }}
+      />
     </main>
   );
 }

@@ -82,7 +82,7 @@ export default function NavBar() {
           {/* 左：ロゴ */}
           <div className="flex items-center gap-2">
             {/* ロゴ画像を入れる場合はここ */}
-            <span className="text-xl font-bold text-yellow-400">CoinGecko</span>
+            <span className="text-xl font-bold text-yellow-400">仮想通貨デモ</span>
           </div>
 
           {/* 中央：ナビゲーションリンク */}

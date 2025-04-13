@@ -55,3 +55,63 @@ export async function logout() {
   revalidatePath('/', 'layout') // キャッシュ再検証（任意）
   redirect('/login') // ログイン画面にリダイレクト
 }
+
+export async function depositAction(_: any, formData: FormData) {
+  const supabase = await createClient()
+  const amount = Number(formData.get('amount'))
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    revalidatePath('/', 'layout') // キャッシュ再検証（任意）
+    redirect('/login') // ログイン画面にリダイレクト
+  }
+
+  console.log ("amount：" + amount);
+
+  const { error } = await supabase.from('deposits').insert({
+    user_id: user.id,
+    amount,
+    currency: 'USD',
+    status: 'completed',
+  })
+  
+  if (error) {
+    return {
+      success: false,
+      errorMessage: error.message,
+    }
+  }
+
+  return {
+    success: true,
+    errorMessage: null,
+  }
+}
+
+export async function fetchUsdBalance() {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    revalidatePath('/', 'layout') // キャッシュ再検証（任意）
+    redirect('/login') // ログイン画面にリダイレクト
+  }
+
+  const { data, error } = await supabase
+    .from('deposits')
+    .select('amount')
+    .eq('user_id', user.id)
+    .eq('status', 'completed')
+
+  if (error || !data) return 0
+
+  // amount合計
+  const total = data.reduce((sum, row) => sum + Number(row.amount), 0)
+  return total
+}
