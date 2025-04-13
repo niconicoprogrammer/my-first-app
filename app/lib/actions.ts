@@ -56,7 +56,7 @@ export async function logout() {
   redirect('/login') // ログイン画面にリダイレクト
 }
 
-export async function depositAction(_: any, formData: FormData) {
+export async function depositAction(_: unknown, formData: FormData) {
   const supabase = await createClient()
   const amount = Number(formData.get('amount'))
 
