@@ -5,11 +5,13 @@ import NavLinks from '@/app/ui/dashboard/nav-links';
 import { logout } from '@/app/lib/actions'; 
 import { useRouter,  useSearchParams } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
+import { useDeposit } from '@/app/ui/dashboard/deposit-context';
 
 export default function NavBar() {
   const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
-  
+  const { deposited, closeDepositNotification } = useDeposit();
+
   const [, formAction, isPending] = useActionState(
     logout,
     undefined
@@ -64,18 +66,30 @@ export default function NavBar() {
 
   return (
     <>
-      {Message && (
-        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
-          <span>{Message}</span>
-          <button
-            onClick={() => setMessage(null)}
-            className="text-white text-xl font-bold hover:text-gray-300"
-            aria-label="閉じる"
-          >
-            ×
-          </button>
-        </div>
-      )}
+        {Message && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
+            <span>{Message}</span>
+            <button
+              onClick={() => setMessage(null)}
+              className="text-white text-xl font-bold hover:text-gray-300"
+              aria-label="閉じる"
+            >
+              ×
+            </button>
+          </div>
+        )}
+        {deposited && (
+          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
+            <span>入金しました！</span>
+            <button
+              onClick={closeDepositNotification}
+              className="text-white text-xl font-bold hover:text-gray-300"
+              aria-label="閉じる"
+            >
+              ×
+            </button>
+          </div>
+        )}
       <header className="w-full bg-[#0f172a] text-white shadow-md border-b border-gray-700">
         <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
           

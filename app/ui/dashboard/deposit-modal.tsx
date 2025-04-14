@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from 'react'
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { depositAction } from '@/app/lib/actions'
+import { useDeposit } from '@/app/ui/dashboard/deposit-context';
 
 type Props = {
   open: boolean;
@@ -21,14 +22,24 @@ const initialState: State = {
 }
 
 export default function DepositModal({ open, onClose, onSuccess }: Props) {
-
+  const { notifyDeposit } = useDeposit()
   const [state, formAction, isPending] = useActionState(
     depositAction,
     initialState
- )
- useEffect(() => {
+  )
+
+  // useEffect(() => {
+  //   if (state.success) {
+  //     state.success = false // 成功フラグをリセット
+  //     onSuccess()
+  //   }
+  // }, [state.success])
+
+  useEffect(() => {
     if (state.success) {
-        state.success = false // 成功フラグをリセット
+      notifyDeposit() // ✅ 入金成功時に通知
+
+      state.success = false // 成功フラグをリセット
       onSuccess()
     }
   }, [state.success])
