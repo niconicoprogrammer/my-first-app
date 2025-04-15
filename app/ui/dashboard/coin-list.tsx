@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import CoinRow from '@/app/ui/dashboard/coin-row';
+import TradeModal from '@/app/ui/dashboard/trade-modal'; // ← 追加
 
 type Coin = {
   id: string;
@@ -17,6 +18,15 @@ type Coin = {
 export default function CoinList({ page }: { page: number }) {
   const [coins, setCoins] = useState<Coin[]>([]);
   const ITEMS_PER_PAGE = 10;
+  const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
+  const [initialMode, setInitialMode] = useState<'buy' | 'sell'>('buy');
+  const [showTradeModal, setShowTradeModal] = useState(false);
+  
+  const handleTradeClick = (coin: Coin, mode: 'buy' | 'sell') => {
+    setSelectedCoin(coin);
+    setInitialMode(mode);
+    setShowTradeModal(true);
+  };
 
   useEffect(() => {
     fetch(
@@ -42,10 +52,25 @@ export default function CoinList({ page }: { page: number }) {
         </thead>
         <tbody>
           {coins.map((coin, index) => (
-            <CoinRow key={coin.id} index={index + (10 * page) - 10} coin={coin} />
+            <CoinRow 
+              key={coin.id} 
+              index={index + (10 * page) - 10} 
+              coin={coin} 
+              onTradeClick={handleTradeClick}
+            />
           ))}
         </tbody>
       </table>
+      
+      {showTradeModal && (
+        <TradeModal
+          open={showTradeModal}
+          onClose={() => setShowTradeModal(false)}
+          onSuccess={() => setShowTradeModal(false)}
+          coin={selectedCoin!}
+          initialMode={initialMode} // ✅ ← 初期モードを明示
+        />
+      )}
     </div>
   );
 }

@@ -19,9 +19,10 @@ type Coin = {
 type Props = {
   coin: Coin;
   index: number;
+  onTradeClick: (coin: Coin, mode: 'buy' | 'sell') => void;
 };
 
-export default function CoinRow({ coin, index }: Props) {
+export default function CoinRow({ coin, index, onTradeClick }: Props) {
   const router = useRouter();
   const [showTradeModal, setShowTradeModal] = useState(false);
   const [initialMode, setInitialMode] = useState<'buy' | 'sell'>('buy');
@@ -63,8 +64,7 @@ export default function CoinRow({ coin, index }: Props) {
               className="px-3 py-1 bg-blue-500 hover:bg-blue-400 rounded text-white text-xs"
               onClick={(e) => {
                 e.stopPropagation();
-                setInitialMode('buy');
-                setShowTradeModal(true);
+                onTradeClick(coin, 'buy');
               }}
             >
               買う
@@ -73,8 +73,7 @@ export default function CoinRow({ coin, index }: Props) {
               className="px-3 py-1 bg-red-500 hover:bg-red-400 rounded text-white text-xs"
               onClick={(e) => {
                 e.stopPropagation();
-                setInitialMode('sell');
-                setShowTradeModal(true);
+                onTradeClick(coin, 'sell');
               }}
             >
               売る
@@ -82,16 +81,6 @@ export default function CoinRow({ coin, index }: Props) {
           </div>
         </td>
       </tr>
-
-    {showTradeModal && (
-      <TradeModal
-        open={showTradeModal}
-        onClose={() => setShowTradeModal(false)}
-        onSuccess={() => setShowTradeModal(false)}
-        coin={coin}
-        initialMode={initialMode} // ✅ ← 初期モードを明示
-      />
-    )}
     </>
   );
 }
