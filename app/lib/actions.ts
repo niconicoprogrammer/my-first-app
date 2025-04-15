@@ -115,3 +115,73 @@ export async function fetchUsdBalance() {
   const total = data.reduce((sum, row) => sum + Number(row.amount), 0)
   return total
 }
+
+export async function tradeAction(_: unknown, formData: FormData) {
+  const supabase = await createClient();
+  const mode = formData.get('mode'); // ← 追加
+
+  const amount = Number(formData.get('amount'));
+  const price = Number(formData.get('price'));
+  const symbol = formData.get('symbol');
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    revalidatePath('/', 'layout');
+    redirect('/login');
+  }
+
+  if (mode === 'buy') {
+    // ✅ 買い処理のみ実装
+    const { data, error: depositsError } = await supabase
+      .from('deposits')
+      .select('amount')
+      .eq('user_id', user.id)
+      .eq('status', 'completed');
+
+    if (depositsError || !data) {
+      return {
+        success: false,
+        errorMessage: depositsError?.message ?? '資産取得に失敗しました',
+      };
+    }
+
+    const USDBalance = data.reduce((sum, row) => sum + Number(row.amount), 0);
+
+    if (amount > USDBalance) {
+      return {
+        success: false,
+        errorMessage: '残高不足です',
+      };
+    }
+
+    const { error: insertError } = await supabase.from('trades').insert({
+      user_id: user.id,
+      trade_type: 'buy',
+      symbol,
+      amount: Number((amount / price).toFixed(8)), // 通貨の数量
+      price,
+      total: amount,
+    });
+
+    if (insertError) {
+      return {
+        success: false,
+        errorMessage: insertError.message,
+      };
+    }
+
+    return {
+      success: true,
+      errorMessage: null,
+    };
+  }
+
+  // TODO: 売り処理が未実装の場合
+  return {
+    success: false,
+    errorMessage: '売却処理はまだ実装されていません',
+  };
+}
