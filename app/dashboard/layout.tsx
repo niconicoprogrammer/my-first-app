@@ -1,14 +1,14 @@
 import NavBar from '@/app/ui/dashboard/nav-bar';
 import BreadCrumb from '@/app/ui/dashboard/bread-crumb';
 import { Suspense } from "react";
-import { DepositProvider } from '@/app/ui/dashboard/deposit-context';
+import { NotificationProvider } from '@/app/ui/dashboard/notification-context';
 
 export const experimental_ppr = true;
 
 export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
-    <DepositProvider>
+    <NotificationProvider>
       <div className="min-h-screen bg-[#0f172a] text-white">
         {/* ナビゲーションバー */}
         <Suspense>
@@ -24,6 +24,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div>{children}</div>
         </div>
       </div>
-    </DepositProvider>
+    </NotificationProvider>
   );
 }

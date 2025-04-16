@@ -5,12 +5,12 @@ import NavLinks from '@/app/ui/dashboard/nav-links';
 import { logout } from '@/app/lib/actions'; 
 import { useRouter,  useSearchParams } from 'next/navigation';
 import { createClient } from '@/app/lib/supabase/client';
-import { useDeposit } from '@/app/ui/dashboard/deposit-context';
+import { useNotification } from '@/app/ui/dashboard/notification-context';
 
 export default function NavBar() {
   const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
-  const { deposited, closeDepositNotification } = useDeposit();
+  const { notification, closeNotification } = useNotification();
 
   const [, formAction, isPending] = useActionState(
     logout,
@@ -78,11 +78,11 @@ export default function NavBar() {
             </button>
           </div>
         )}
-        {deposited && (
+        {notification && (
           <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
             <span>入金しました！</span>
             <button
-              onClick={closeDepositNotification}
+              onClick={closeNotification}
               className="text-white text-xl font-bold hover:text-gray-300"
               aria-label="閉じる"
             >
