@@ -66,30 +66,33 @@ export default function NavBar() {
 
   return (
     <>
-        {Message && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
-            <span>{Message}</span>
-            <button
-              onClick={() => setMessage(null)}
-              className="text-white text-xl font-bold hover:text-gray-300"
-              aria-label="閉じる"
-            >
-              ×
-            </button>
-          </div>
-        )}
-        {notification && (
-          <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
-            <span>入金しました！</span>
-            <button
-              onClick={closeNotification}
-              className="text-white text-xl font-bold hover:text-gray-300"
-              aria-label="閉じる"
-            >
-              ×
-            </button>
-          </div>
-        )}
+      {Message && (
+        <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50">
+          <span>{Message}</span>
+          <button
+            onClick={() => setMessage(null)}
+            className="text-white text-xl font-bold hover:text-gray-300"
+            aria-label="閉じる"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      {notification && (
+        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded shadow-lg flex items-center gap-4 z-50
+          ${notification.type === 'success' ? 'bg-green-600' : notification.type === 'error' ? 'bg-red-600' : 'bg-blue-600'}
+        `}>
+          <span>{notification.message}</span>
+          <button
+            onClick={closeNotification}
+            className="text-white text-xl font-bold hover:text-gray-300"
+            aria-label="閉じる"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <header className="w-full bg-[#0f172a] text-white shadow-md border-b border-gray-700">
         <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
           

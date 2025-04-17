@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/app/lib/supabase/server'
+import { getUsdBalance } from '@/app/lib/supabase/helpers'
 
 export async function login(f_prevState: string | undefined, formData: FormData) {
   const supabase = await createClient()
@@ -103,17 +104,17 @@ export async function fetchUsdBalance() {
     redirect('/login') // ログイン画面にリダイレクト
   }
 
-  const { data, error } = await supabase
-    .from('deposits')
-    .select('amount')
-    .eq('user_id', user.id)
-    .eq('status', 'completed')
+  const { balance, errorMessage } = await getUsdBalance(user.id);
 
-  if (error || !data) return 0
+  console.log('残高:', balance);
 
-  // amount合計
-  const total = data.reduce((sum, row) => sum + Number(row.amount), 0)
-  return total
+  if (errorMessage) {
+    console.error('エラー:', errorMessage);
+  } else {
+    console.log('残高:', balance);
+  }
+
+  return balance;
 }
 
 export async function tradeAction(_: unknown, formData: FormData) {
@@ -133,24 +134,19 @@ export async function tradeAction(_: unknown, formData: FormData) {
     redirect('/login');
   }
 
+  // 買い処理
   if (mode === 'buy') {
-    // ✅ 買い処理のみ実装
-    const { data, error: depositsError } = await supabase
-      .from('deposits')
-      .select('amount')
-      .eq('user_id', user.id)
-      .eq('status', 'completed');
+    const { balance, errorMessage } = await getUsdBalance(user.id);
+    console.log('残高:', balance);
 
-    if (depositsError || !data) {
+    if (errorMessage) {
       return {
         success: false,
-        errorMessage: depositsError?.message ?? '資産取得に失敗しました',
+        errorMessage: errorMessage,
       };
     }
 
-    const USDBalance = data.reduce((sum, row) => sum + Number(row.amount), 0);
-
-    if (amount > USDBalance) {
+    if (balance < amount) {
       return {
         success: false,
         errorMessage: '残高不足です',
@@ -162,8 +158,7 @@ export async function tradeAction(_: unknown, formData: FormData) {
       trade_type: 'buy',
       symbol,
       amount: Number((amount / price).toFixed(8)), // 通貨の数量
-      price,
-      total: amount,
+      price
     });
 
     if (insertError) {
@@ -180,8 +175,15 @@ export async function tradeAction(_: unknown, formData: FormData) {
   }
 
   // TODO: 売り処理が未実装の場合
+  // 成功テスト
   return {
-    success: false,
-    errorMessage: '売却処理はまだ実装されていません',
+    success: true,
+    errorMessage: null,
   };
+
+  // 失敗テスト
+  // return {
+  //   success: false,
+  //   errorMessage: '売却処理はまだ実装されていません',
+  // };
 }

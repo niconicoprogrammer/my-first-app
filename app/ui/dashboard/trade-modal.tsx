@@ -1,8 +1,9 @@
 'use client';
 
-import { useActionState, useState } from 'react';
+import { useActionState, useState, useEffect } from 'react';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { tradeAction } from '@/app/lib/actions'
+import { useNotification } from '@/app/ui/dashboard/notification-context';
 
 type Coin = {
   id: string;
@@ -34,8 +35,18 @@ const initialState: State = {
 }
 
 export default function TradeModal({ open, onClose, onSuccess,  coin, initialMode = 'buy' }: Props) {
+  const { notify } = useNotification()
   const [mode, setMode] = useState<'buy' | 'sell'>(initialMode); // ← 初期値
   const [state, formAction, isPending] = useActionState(tradeAction, initialState);
+
+  useEffect(() => {
+    if (state.success) {
+      notify('success', mode === 'buy' ? '購入が完了しました！' : '売却が完了しました！');
+
+      state.success = false // 成功フラグをリセット
+      onSuccess()
+    }
+  }, [state.success])
 
   return (
     <Dialog open={open} onClose={onClose} className="relative z-50">
@@ -103,21 +114,27 @@ export default function TradeModal({ open, onClose, onSuccess,  coin, initialMod
               </button>
               <button
                 type="submit"
-                className={`px-4 py-2 rounded font-semibold transition ${
+                disabled={isPending}
+                className={`px-4 py-2 rounded font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed ${
                   mode === 'buy'
                     ? 'bg-blue-500 hover:bg-blue-400 text-white'
                     : 'bg-red-500 hover:bg-red-400 text-white'
                 }`}
               >
-                {mode === 'buy' ? '購入する' : '売却する'}
+                {isPending
+                  ? mode === 'buy'
+                    ? '購入中...'
+                    : '売却中...'
+                  : mode === 'buy'
+                  ? '購入する'
+                  : '売却する'}
               </button>
             </div>
           </form>
 
-          {/* ✅ エラーメッセージの表示 */}
-          {state.errorMessage && (
-            <p className="mt-4 text-sm text-red-500">{state.errorMessage}</p>
-          )}
+          {/* 結果表示 */}
+          {state?.success && (<p className="text-red-500 mt-4">取引が完了しました。</p>)}
+          {state?.errorMessage && (<p className="text-red-500 mt-4">{state.errorMessage}</p>)}
         </DialogPanel>
       </div>
     </Dialog>

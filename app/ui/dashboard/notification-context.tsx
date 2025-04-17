@@ -2,26 +2,31 @@
 
 import { createContext, useContext, useState } from 'react';
 
+type Notification = {
+  type: 'success' | 'error' | 'info';
+  message: string;
+} | null;
+
 export const NotificationContext = createContext<{
-  notification: boolean;
-  notify: () => void;
+  notification: Notification;
+  notify: (type: 'success' | 'error' | 'info', message: string) => void;
   closeNotification: () => void; // ← 追加
 }>({
-  notification: false,
+  notification: null,
   notify: () => {},
   closeNotification: () => {}, // ← 追加
 });
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
-  const [notification, setNotification] = useState(false);
+  const [notification, setNotification] = useState<Notification>(null);
 
-  const notify = () => {
-    setNotification(true);
-    setTimeout(() => setNotification(false), 10000);
+  const notify = (type: 'success' | 'error' | 'info', message: string) => {
+    setNotification({ type, message });
+    setTimeout(() => setNotification(null), 10000);
   };
 
   const closeNotification = () => {
-    setNotification(false); // ← 手動で閉じたいときに使う
+    setNotification(null); // ✅ 手動でも非表示にできるように
   };
 
   return (

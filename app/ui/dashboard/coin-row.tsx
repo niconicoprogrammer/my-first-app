@@ -2,8 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import SparklineChart from '@/app/ui/dashboard/sparkline-chart';
-import { useState } from 'react';
-import TradeModal from '@/app/ui/dashboard/trade-modal'; // ← 追加
 
 type Coin = {
   id: string;
@@ -20,12 +18,11 @@ type Props = {
   coin: Coin;
   index: number;
   onTradeClick: (coin: Coin, mode: 'buy' | 'sell') => void;
+  holdingAmount: number; // ←追加
 };
 
-export default function CoinRow({ coin, index, onTradeClick }: Props) {
+export default function CoinRow({ coin, index, onTradeClick, holdingAmount }: Props) {
   const router = useRouter();
-  const [showTradeModal, setShowTradeModal] = useState(false);
-  const [initialMode, setInitialMode] = useState<'buy' | 'sell'>('buy');
 
   const handleClick = () => {
     router.push(`/dashboard/${coin.id}`);
@@ -55,7 +52,12 @@ export default function CoinRow({ coin, index, onTradeClick }: Props) {
           <SparklineChart data={coin.sparkline_in_7d.price} />
         </td>
         <td className="py-3 px-4 w-[120px] text-left text-sm text-white">
-          0.00
+          {holdingAmount.toFixed(8)}
+        </td>
+
+        {/* ✅ USD換算（仮） */}
+        <td className="py-3 px-4 w-[120px] text-left text-sm text-white">
+          ${(holdingAmount * coin.current_price).toFixed(2)}
         </td>
 
         <td className="py-3 px-4 w-[180px]">

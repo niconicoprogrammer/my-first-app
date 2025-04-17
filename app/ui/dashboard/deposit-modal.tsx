@@ -23,10 +23,7 @@ const initialState: State = {
 
 export default function DepositModal({ open, onClose, onSuccess }: Props) {
   const { notify } = useNotification()
-  const [state, formAction, isPending] = useActionState(
-    depositAction,
-    initialState
-  )
+  const [state, formAction, isPending] = useActionState(depositAction, initialState);
 
   // useEffect(() => {
   //   if (state.success) {
@@ -37,7 +34,7 @@ export default function DepositModal({ open, onClose, onSuccess }: Props) {
 
   useEffect(() => {
     if (state.success) {
-      notify() // ✅ 入金成功時に通知
+      notify('success', '入金が完了しました！');
 
       state.success = false // 成功フラグをリセット
       onSuccess()
