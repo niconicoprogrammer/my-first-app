@@ -117,12 +117,15 @@ export async function fetchUsdBalance() {
   return balance;
 }
 
-export async function tradeAction(_: unknown, formData: FormData) {
+export async function tradeAction(_: unknown, formData: FormData, ) {
   const supabase = await createClient();
   const mode = formData.get('mode'); // ← 追加
 
   const amount = Number(formData.get('amount'));
-  const price = Number(formData.get('price'));
+  const current_price = Number(formData.get('current_price'));
+  const usdTotal = Number(formData.get('usdTotal'));
+  const holdingAmount = Number(formData.get('holdingAmount'));
+  const usdValueOfHolding = holdingAmount * current_price; // 保有USD換算額
   const symbol = formData.get('symbol');
 
   const {
@@ -136,17 +139,8 @@ export async function tradeAction(_: unknown, formData: FormData) {
 
   // 買い処理
   if (mode === 'buy') {
-    const { balance, errorMessage } = await getUsdBalance(user.id);
-    console.log('残高:', balance);
 
-    if (errorMessage) {
-      return {
-        success: false,
-        errorMessage: errorMessage,
-      };
-    }
-
-    if (balance < amount) {
+    if (usdTotal < amount) {
       return {
         success: false,
         errorMessage: '残高不足です',
@@ -157,8 +151,8 @@ export async function tradeAction(_: unknown, formData: FormData) {
       user_id: user.id,
       trade_type: 'buy',
       symbol,
-      amount: Number((amount / price).toFixed(8)), // 通貨の数量
-      price
+      amount: Number((amount / current_price).toFixed(8)), // 通貨の数量
+      price: current_price
     });
 
     if (insertError) {
@@ -174,16 +168,42 @@ export async function tradeAction(_: unknown, formData: FormData) {
     };
   }
 
-  // TODO: 売り処理が未実装の場合
-  // 成功テスト
-  return {
-    success: true,
-    errorMessage: null,
-  };
+  // 売却処理
+  if (mode === 'sell') {
+  
+    if (usdValueOfHolding < amount) {
+      return {
+        success: false,
+        errorMessage: `保有USD換算額が不足しています`,
+      };
+    }
+  
+    const sellAmount = Number((amount / current_price).toFixed(8));
+  
+    const { error: sellError } = await supabase.from('trades').insert({
+      user_id: user.id,
+      trade_type: 'sell',
+      symbol,
+      amount: sellAmount,
+      price: current_price,
+    });
+  
+    if (sellError) {
+      return {
+        success: false,
+        errorMessage: sellError.message,
+      };
+    }
+  
+    return {
+      success: true,
+      errorMessage: null,
+    };
+  }
 
-  // 失敗テスト
-  // return {
-  //   success: false,
-  //   errorMessage: '売却処理はまだ実装されていません',
-  // };
+  // ✅ 不明なモード
+  return {
+    success: false,
+    errorMessage: '無効な取引モードです',
+  };
 }

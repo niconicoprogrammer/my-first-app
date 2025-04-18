@@ -17,7 +17,14 @@ type Coin = {
   };
 };
 
-export default function CoinList({ page }: { page: number }) {
+type Props = {
+  page: number;
+  onUsdRefresh: () => void; // ← これ追加！
+  usdTotal: number | null;
+};
+
+export default function CoinList({ page, onUsdRefresh, usdTotal }: Props) {
+  console.log("coinlist usdTotal" + usdTotal)
   const [coins, setCoins] = useState<Coin[]>([]);
   const ITEMS_PER_PAGE = 10;
   const [selectedCoin, setSelectedCoin] = useState<Coin | null>(null);
@@ -90,10 +97,13 @@ export default function CoinList({ page }: { page: number }) {
           onClose={() => setShowTradeModal(false)}
           onSuccess={() => {
             setShowTradeModal(false);
+            onUsdRefresh(); // ✅ USD資産を更新
             fetchHoldings(); // ✅ 再取得して全体更新（最初はこれで十分）
           }}
           coin={selectedCoin!}
           initialMode={initialMode} // ✅ ← 初期モードを明示
+          usdTotal={usdTotal || 0} // ← 追加
+          holdingAmount={holdings[selectedCoin?.symbol.toLowerCase() ?? ''] ?? 0} // ← 保有量を渡す
         />
       )}
     </div>

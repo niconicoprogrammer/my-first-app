@@ -52,7 +52,7 @@ export default function Page() {
         <h1 className="text-3xl font-extrabold text-yellow-400">通貨一覧</h1>
 
         {/* Coin一覧 */}
-        <CoinList page={page} />
+        <CoinList page={page} onUsdRefresh={refreshUsdTotal} usdTotal={usdTotal}/>
 
         <div className="flex justify-center items-center gap-4 mt-8">
           {/* ← Prev */}
@@ -63,7 +63,6 @@ export default function Page() {
           >
             ← Prev
           </button>
-
           {/* ページ番号ボタン */}
           {pagination.map((p) => (
             <button

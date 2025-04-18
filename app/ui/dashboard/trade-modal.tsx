@@ -22,6 +22,8 @@ type Props = {
   onSuccess: () => void;
   coin: Coin;
   initialMode?: 'buy' | 'sell'; // ← 追加
+  usdTotal: number | 0; // ← 追加
+  holdingAmount: number; // ← 追加
 };
 
 type State = {
@@ -34,7 +36,9 @@ const initialState: State = {
     errorMessage: null,
 }
 
-export default function TradeModal({ open, onClose, onSuccess,  coin, initialMode = 'buy' }: Props) {
+export default function TradeModal({ open, onClose, onSuccess,  coin, initialMode = 'buy' , usdTotal, holdingAmount}: Props) {
+  console.log("holdingAmount:" + holdingAmount)
+  console.log("trade modal usdTotal:" + usdTotal)
   const { notify } = useNotification()
   const [mode, setMode] = useState<'buy' | 'sell'>(initialMode); // ← 初期値
   const [state, formAction, isPending] = useActionState(tradeAction, initialState);
@@ -86,6 +90,22 @@ export default function TradeModal({ open, onClose, onSuccess,  coin, initialMod
             </button>
           </div>
 
+          {/* ✅ 保有情報の表示ブロック */}
+          <div className="mb-4 space-y-2 text-sm text-gray-300">
+            <div className="flex justify-between">
+              <span className="text-gray-400">保有 USD 資産</span>
+              <span className="font-semibold text-white">${usdTotal}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">保有 {coin.symbol.toUpperCase()}</span>
+              <span className="font-semibold text-white">{holdingAmount} </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">USD換算</span>
+              <span className="font-semibold text-white">${(holdingAmount * coin.current_price).toFixed(2)}</span>
+            </div>
+          </div>
+
           {/* 入力フォーム */}
           <form action={formAction} className="space-y-4">
 
@@ -101,7 +121,9 @@ export default function TradeModal({ open, onClose, onSuccess,  coin, initialMod
             />
 
             <input type="hidden" name="symbol" value={coin.symbol} />
-            <input type="hidden" name="price" value={coin.current_price} />
+            <input type="hidden" name="current_price" value={coin.current_price} />
+            <input type="hidden" name="holdingAmount" value={holdingAmount} />
+            <input type="hidden" name="usdTotal" value={usdTotal} />
             <input type="hidden" name="mode" value={mode} />
 
             <div className="flex justify-end gap-2">
