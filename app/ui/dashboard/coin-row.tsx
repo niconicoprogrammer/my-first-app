@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import SparklineChart from '@/app/ui/dashboard/sparkline-chart';
 
 type Coin = {
@@ -22,7 +22,7 @@ type Props = {
 };
 
 export default function CoinRow({ coin, index, onTradeClick, holdingAmount }: Props) {
-  const router = useRouter();
+  // const router = useRouter();
 
   // const handleClick = () => {
   //   router.push(`/dashboard/${coin.id}`);
