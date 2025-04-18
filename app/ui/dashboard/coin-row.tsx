@@ -24,9 +24,9 @@ type Props = {
 export default function CoinRow({ coin, index, onTradeClick, holdingAmount }: Props) {
   const router = useRouter();
 
-  const handleClick = () => {
-    router.push(`/dashboard/${coin.id}`);
-  };
+  // const handleClick = () => {
+  //   router.push(`/dashboard/${coin.id}`);
+  // };
 
   return (
     <>
