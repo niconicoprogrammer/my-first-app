@@ -3,6 +3,15 @@
 import { useState, useEffect } from 'react';
 import { fetchUnifiedHistory } from '@/app/lib/actions';
 
+// 🔸 CoinGecko APIのレスポンス型を追加（★追加①）
+type CoinGeckoCoin = {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+};
+
 type UnifiedHistory = {
   id: string;
   type: 'deposit' | 'buy' | 'sell';
@@ -41,12 +50,14 @@ export default function HistoryList() {
       const res = await fetch(
         `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=&symbols=${query}`
       );
-      const coins = await res.json();
 
-      // 4. symbol → imageのマップ作成
+      // 🔸 CoinGeckoCoin型を適用（★変更②）
+      const coins: CoinGeckoCoin[] = await res.json();
+
       const symbolToImage: { [symbol: string]: string } = {};
-      // 取得してきたコインの配列回してsymbol:imageのマップを作成
-      coins.forEach((coin: any) => {
+
+      // 🔸 型付きでforEach（★変更③）
+      coins.forEach((coin: CoinGeckoCoin) => {
         symbolToImage[coin.symbol.toLowerCase()] = coin.image;
       });
 
