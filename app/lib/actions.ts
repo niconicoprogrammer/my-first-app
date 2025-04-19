@@ -207,3 +207,57 @@ export async function tradeAction(_: unknown, formData: FormData, ) {
     errorMessage: '無効な取引モードです',
   };
 }
+
+export async function fetchUnifiedHistory() {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    revalidatePath('/', 'layout');
+    redirect('/login');
+  }
+
+  const { data: deposits } = await supabase
+    .from('deposits')
+    .select('id, created_at, amount, status')
+    .eq('user_id', user.id);
+
+  const { data: trades } = await supabase
+    .from('trades')
+    .select('id, created_at, symbol, amount, price, trade_type')
+    .eq('user_id', user.id);
+
+  // 整形して type を付ける
+  const depositHistory = (deposits ?? []).map((d) => ({
+    id: d.id,
+    type: 'deposit' as const,
+    date: d.created_at,
+    amount: null,
+    price: null,
+    usdTotal: Number(d.amount),
+    symbol: null,
+    image: null,
+  }));
+
+  const tradeHistory = (trades ?? []).map((t) => ({
+    id: t.id,
+    type: t.trade_type as 'buy' | 'sell',
+    date: t.created_at,
+    amount: Number(t.amount),
+    price: Number(t.price),
+    usdTotal: Number(t.amount) * Number(t.price),
+    symbol: t.symbol,
+    image: null,
+  }));
+
+  // 合体＋ソート
+  const unified = [...depositHistory, ...tradeHistory].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  return unified;
+}
+
